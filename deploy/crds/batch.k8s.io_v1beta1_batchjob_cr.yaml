@@ -4,4 +4,4 @@ metadata:
   name: example-batchjob
 spec:
   # Add fields here
-  size: 3
+  image: "gcr.io/spark-operator/spark:v2.4.4"

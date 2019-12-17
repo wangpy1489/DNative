@@ -58,5 +58,6 @@ rules:
   - batch.k8s.io
   resources:
   - '*'
+  - httptriggers
   verbs:
   - '*'
