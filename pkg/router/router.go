@@ -4,19 +4,23 @@ import (
 	"net/http"
 	"fmt"
 	"log"
+
+	"sigs.k8s.io/controller-runtime/pkg/client"
 	"github.com/gorilla/mux"
 )
 
 type(
 	Router struct{
 		logger *log.Logger
+		kubeclient client.Client
 		info string
 	}
 )
 
-func MakeRouter(in_logger *log.Logger) (*Router,error) {
+func MakeRouter(in_logger *log.Logger, kubeclient client.Client) (*Router,error) {
 	return &Router{
 		logger: in_logger,
+		kubeclient: kubeclient,
 		info: "trigger router",
 	}, nil
 }
@@ -24,6 +28,7 @@ func MakeRouter(in_logger *log.Logger) (*Router,error) {
 func (rou *Router) GetHandler() http.Handler {
 	r := mux.NewRouter()
 	r.HandleFunc("/", rou.HomeHandler).Methods("GET")
+	r.HandleFunc("/v1/{httpTrigger}",rou.HttpTrigger).Methods("GET")
 	return r
 }
 

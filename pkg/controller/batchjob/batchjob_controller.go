@@ -11,7 +11,7 @@ import (
 	"k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
-	// "k8s.io/apimachinery/pkg/types"
+	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/apimachinery/pkg/api/equality"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/controller"
@@ -111,6 +111,12 @@ func (r *ReconcileBatchJob) Reconcile(request reconcile.Request) (reconcile.Resu
 		return reconcile.Result{}, err
 	}
 
+		// sparkapp := &sparkv1beta2.SparkApplication{}
+	// err = r.client.Get(context.TODO(),request.NamespacedName,sparkapp)
+	// if err != nil {
+	// 	reqLogger.Error(err,"faild to get spark App")
+	// }
+	// log.Info("Now Get sparkAPP:",sparkapp.Name,sparkapp.Spec.Image)
 	instanceUpdate := instance.DeepCopy()
 	switch instanceUpdate.Status.JobState {
 	case batchv1beta1.NewState:
@@ -194,8 +200,8 @@ func newPodForCR(cr *batchv1beta1.BatchJob) *corev1.Pod {
 }
 
 func (r *ReconcileBatchJob) cleanupApps (request reconcile.Request) error {
-	// sparkapp := &sparkv1beta2.SparkApplication{}
-	sparkapp, err := r.sparkClient.Sparkoperator().SparkApplications(request.Namespace).Get(request.Name,metav1.GetOptions{})
+	sparkapp := &sparkv1beta2.SparkApplication{}
+	err := r.client.Get(context.TODO(),request.NamespacedName, sparkapp)
 	// log.Info("no get sparkAPP: ",sparkapp)
 	if err != nil {
 		if errors.IsNotFound(err){
@@ -203,7 +209,7 @@ func (r *ReconcileBatchJob) cleanupApps (request reconcile.Request) error {
 		}
 		return  err
 	}
-	err = r.sparkClient.Sparkoperator().SparkApplications(request.Namespace).Delete(sparkapp.Name,&metav1.DeleteOptions{})
+	err = r.client.Delete(context.TODO(),sparkapp)
 	if err != nil {
 		log.Info("unable to delete: ",  err)
 		return  err
@@ -264,7 +270,8 @@ func (r *ReconcileBatchJob) submitBatchJob (job *batchv1beta1.BatchJob) (*sparkv
 	*newApp.Spec.MainApplicationFile = "local:///opt/spark/examples/jars/spark-examples_2.11-2.4.4.jar"
 	*newApp.Spec.Executor.Instances = 1
 	*newApp.Spec.Driver.ServiceAccount = "sparkoperator-spark"
-	newApp, err := r.sparkClient.Sparkoperator().SparkApplications(job.Namespace).Create(newApp)
+	err := r.client.Create(context.TODO(),newApp)
+	// newApp, err := r.sparkClient.Sparkoperator().SparkApplications(job.Namespace).Create(newApp)
 	
 	return newApp, err
 }
@@ -274,12 +281,15 @@ func (r *ReconcileBatchJob) deleteBatchJob (job *batchv1beta1.BatchJob) error {
 }
 
 func (r *ReconcileBatchJob) followBatchApplicationState (job *batchv1beta1.BatchJob) error {
-	sparkapp, err := r.sparkClient.Sparkoperator().SparkApplications(job.Namespace).Get(job.Name,metav1.GetOptions{})
+	sparkapp := &sparkv1beta2.SparkApplication{}
+	err := r.client.Get(context.TODO(),types.NamespacedName{Namespace:job.Namespace, Name: job.Name},sparkapp)
+	log.Info("Now Get sparkAPP:",sparkapp.Kind)
 	if err != nil {
 		if errors.IsNotFound(err){
 			job.Status.JobState = batchv1beta1.FailedState
 			return nil
 		}
+		log.Error(err,"Problem in Get sparkAPP")
 		return  err
 	}
 	if err:= r.syncBatchApplication(job, sparkapp); err != nil{
