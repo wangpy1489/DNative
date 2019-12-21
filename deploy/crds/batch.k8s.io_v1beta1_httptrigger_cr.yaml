@@ -4,4 +4,6 @@ metadata:
   name: example-httptrigger
 spec:
   # Add fields here
-  size: 3
+  relativeurl: "test"
+  jobref: 
+    name: "example-batchjob"

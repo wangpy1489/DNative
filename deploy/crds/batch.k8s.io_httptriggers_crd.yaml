@@ -30,6 +30,19 @@ spec:
           type: object
         spec:
           description: HttpTriggerSpec defines the desired state of HttpTrigger
+          properties:
+            jobref:
+              properties:
+                name:
+                  type: string
+              required:
+              - name
+              type: object
+            relativeurl:
+              type: string
+          required:
+          - jobref
+          - relativeurl
           type: object
         status:
           description: HttpTriggerStatus defines the observed state of HttpTrigger

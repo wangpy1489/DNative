@@ -155,8 +155,24 @@ func schema_pkg_apis_batch_v1beta1_HttpTriggerSpec(ref common.ReferenceCallback)
 			SchemaProps: spec.SchemaProps{
 				Description: "HttpTriggerSpec defines the desired state of HttpTrigger",
 				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"jobref": {
+						SchemaProps: spec.SchemaProps{
+							Ref: ref("github.com/wangpy1489/DNative/pkg/apis/batch/v1beta1.JobReference"),
+						},
+					},
+					"relativeurl": {
+						SchemaProps: spec.SchemaProps{
+							Type:   []string{"string"},
+							Format: "",
+						},
+					},
+				},
+				Required: []string{"jobref", "relativeurl"},
 			},
 		},
+		Dependencies: []string{
+			"github.com/wangpy1489/DNative/pkg/apis/batch/v1beta1.JobReference"},
 	}
 }
 

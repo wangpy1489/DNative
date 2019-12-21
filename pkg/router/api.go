@@ -9,6 +9,7 @@ import (
 	batchv1beta1 "github.com/wangpy1489/DNative/pkg/apis/batch/v1beta1"
 	"k8s.io/apimachinery/pkg/types"
 	"github.com/gorilla/mux"
+	"github.com/wangpy1489/DNative/pkg/router/resource"
 )
 
 
@@ -33,12 +34,23 @@ func (rou *Router) HttpTrigger(w http.ResponseWriter, r *http.Request)  {
 	namespace := r.URL.Query().Get("namespace")
 	httpTrigger := &batchv1beta1.HttpTrigger{}
 	rou.logger.Println(namespace,name)
-	
 	err := rou.kubeclient.Get(context.TODO(), types.NamespacedName{Namespace: namespace, Name: name,}, httpTrigger)
 	if err != nil {
 		rou.logger.Fatal(err)
+		return
 	}
-	resp, err := json.Marshal(httpTrigger)
+	batchJob := &batchv1beta1.BatchJob{}
+	err = rou.kubeclient.Get(context.TODO(),types.NamespacedName{Namespace: httpTrigger.Namespace, Name: httpTrigger.Spec.JobReference.Nmae},batchJob)
+	if err != nil {
+		rou.logger.Fatal(err)
+		return
+	}
+	sparkapp, err := resource.SubmitBatchJob(rou.kubeclient,batchJob)
+	if err != nil {
+		rou.logger.Fatal(err)
+		return
+	}
+	resp, err := json.Marshal(sparkapp)
 	if err != nil {
 		rou.logger.Fatal(err)
 		return
