@@ -7,25 +7,21 @@ import (
 // EDIT THIS FILE!  THIS IS SCAFFOLDING FOR YOU TO OWN!
 // NOTE: json tags are required.  Any new fields you add must have json tags for the fields to be serialized.
 
-type JobReference struct{
-	Name string `json:"name"`
-}
-
-// HttpTriggerSpec defines the desired state of HttpTrigger
+// TimerTriggerSpec defines the desired state of TimerTrigger
 // +k8s:openapi-gen=true
-type HttpTriggerSpec struct {
-	// INSERT ADDITIONAL SPEC FIELDS - desired state of cluster	
+type TimerTriggerSpec struct {
+	// INSERT ADDITIONAL SPEC FIELDS - desired state of cluster
 	// Important: Run "operator-sdk generate k8s" to regenerate code after modifying this file
 	// Add custom validation using kubebuilder tags: https://book-v1.book.kubebuilder.io/beyond_basics/generating_crd.html
 
-	JobReference JobReference `json:"jobref"`
+	Cron string `json:"cron"`
 
-	RelativeURL string `json:"relativeurl"`
+	JobReference JobReference `json:"jobref"`
 }
 
-// HttpTriggerStatus defines the observed state of HttpTrigger
+// TimerTriggerStatus defines the observed state of TimerTrigger
 // +k8s:openapi-gen=true
-type HttpTriggerStatus struct {
+type TimerTriggerStatus struct {
 	// INSERT ADDITIONAL STATUS FIELD - define observed state of cluster
 	// Important: Run "operator-sdk generate k8s" to regenerate code after modifying this file
 	// Add custom validation using kubebuilder tags: https://book-v1.book.kubebuilder.io/beyond_basics/generating_crd.html
@@ -33,27 +29,27 @@ type HttpTriggerStatus struct {
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 
-// HttpTrigger is the Schema for the httptriggers API
+// TimerTrigger is the Schema for the timertriggers API
 // +k8s:openapi-gen=true
 // +kubebuilder:subresource:status
-// +kubebuilder:resource:path=httptriggers,scope=Namespaced
-type HttpTrigger struct {
+// +kubebuilder:resource:path=timertriggers,scope=Namespaced
+type TimerTrigger struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
 
-	Spec   HttpTriggerSpec   `json:"spec,omitempty"`
-	Status HttpTriggerStatus `json:"status,omitempty"`
+	Spec   TimerTriggerSpec   `json:"spec,omitempty"`
+	Status TimerTriggerStatus `json:"status,omitempty"`
 }
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 
-// HttpTriggerList contains a list of HttpTrigger
-type HttpTriggerList struct {
+// TimerTriggerList contains a list of TimerTrigger
+type TimerTriggerList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata,omitempty"`
-	Items           []HttpTrigger `json:"items"`
+	Items           []TimerTrigger `json:"items"`
 }
 
 func init() {
-	SchemeBuilder.Register(&HttpTrigger{}, &HttpTriggerList{})
+	SchemeBuilder.Register(&TimerTrigger{}, &TimerTriggerList{})
 }

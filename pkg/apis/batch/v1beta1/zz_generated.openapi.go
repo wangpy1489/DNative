@@ -11,12 +11,15 @@ import (
 
 func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenAPIDefinition {
 	return map[string]common.OpenAPIDefinition{
-		"github.com/wangpy1489/DNative/pkg/apis/batch/v1beta1.BatchJob":          schema_pkg_apis_batch_v1beta1_BatchJob(ref),
-		"github.com/wangpy1489/DNative/pkg/apis/batch/v1beta1.BatchJobSpec":      schema_pkg_apis_batch_v1beta1_BatchJobSpec(ref),
-		"github.com/wangpy1489/DNative/pkg/apis/batch/v1beta1.BatchJobStatus":    schema_pkg_apis_batch_v1beta1_BatchJobStatus(ref),
-		"github.com/wangpy1489/DNative/pkg/apis/batch/v1beta1.HttpTrigger":       schema_pkg_apis_batch_v1beta1_HttpTrigger(ref),
-		"github.com/wangpy1489/DNative/pkg/apis/batch/v1beta1.HttpTriggerSpec":   schema_pkg_apis_batch_v1beta1_HttpTriggerSpec(ref),
-		"github.com/wangpy1489/DNative/pkg/apis/batch/v1beta1.HttpTriggerStatus": schema_pkg_apis_batch_v1beta1_HttpTriggerStatus(ref),
+		"github.com/wangpy1489/DNative/pkg/apis/batch/v1beta1.BatchJob":           schema_pkg_apis_batch_v1beta1_BatchJob(ref),
+		"github.com/wangpy1489/DNative/pkg/apis/batch/v1beta1.BatchJobSpec":       schema_pkg_apis_batch_v1beta1_BatchJobSpec(ref),
+		"github.com/wangpy1489/DNative/pkg/apis/batch/v1beta1.BatchJobStatus":     schema_pkg_apis_batch_v1beta1_BatchJobStatus(ref),
+		"github.com/wangpy1489/DNative/pkg/apis/batch/v1beta1.HttpTrigger":        schema_pkg_apis_batch_v1beta1_HttpTrigger(ref),
+		"github.com/wangpy1489/DNative/pkg/apis/batch/v1beta1.HttpTriggerSpec":    schema_pkg_apis_batch_v1beta1_HttpTriggerSpec(ref),
+		"github.com/wangpy1489/DNative/pkg/apis/batch/v1beta1.HttpTriggerStatus":  schema_pkg_apis_batch_v1beta1_HttpTriggerStatus(ref),
+		"github.com/wangpy1489/DNative/pkg/apis/batch/v1beta1.TimerTrigger":       schema_pkg_apis_batch_v1beta1_TimerTrigger(ref),
+		"github.com/wangpy1489/DNative/pkg/apis/batch/v1beta1.TimerTriggerSpec":   schema_pkg_apis_batch_v1beta1_TimerTriggerSpec(ref),
+		"github.com/wangpy1489/DNative/pkg/apis/batch/v1beta1.TimerTriggerStatus": schema_pkg_apis_batch_v1beta1_TimerTriggerStatus(ref),
 	}
 }
 
@@ -181,6 +184,72 @@ func schema_pkg_apis_batch_v1beta1_HttpTriggerStatus(ref common.ReferenceCallbac
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
 				Description: "HttpTriggerStatus defines the observed state of HttpTrigger",
+				Type:        []string{"object"},
+			},
+		},
+	}
+}
+
+func schema_pkg_apis_batch_v1beta1_TimerTrigger(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "TimerTrigger is the Schema for the timertriggers API",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"kind": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#types-kinds",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"apiVersion": {
+						SchemaProps: spec.SchemaProps{
+							Description: "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#resources",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"metadata": {
+						SchemaProps: spec.SchemaProps{
+							Ref: ref("k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta"),
+						},
+					},
+					"spec": {
+						SchemaProps: spec.SchemaProps{
+							Ref: ref("github.com/wangpy1489/DNative/pkg/apis/batch/v1beta1.TimerTriggerSpec"),
+						},
+					},
+					"status": {
+						SchemaProps: spec.SchemaProps{
+							Ref: ref("github.com/wangpy1489/DNative/pkg/apis/batch/v1beta1.TimerTriggerStatus"),
+						},
+					},
+				},
+			},
+		},
+		Dependencies: []string{
+			"github.com/wangpy1489/DNative/pkg/apis/batch/v1beta1.TimerTriggerSpec", "github.com/wangpy1489/DNative/pkg/apis/batch/v1beta1.TimerTriggerStatus", "k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta"},
+	}
+}
+
+func schema_pkg_apis_batch_v1beta1_TimerTriggerSpec(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "TimerTriggerSpec defines the desired state of TimerTrigger",
+				Type:        []string{"object"},
+			},
+		},
+	}
+}
+
+func schema_pkg_apis_batch_v1beta1_TimerTriggerStatus(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "TimerTriggerStatus defines the observed state of TimerTrigger",
 				Type:        []string{"object"},
 			},
 		},

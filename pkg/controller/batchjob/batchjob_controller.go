@@ -2,6 +2,7 @@ package batchjob
 
 import (
 	"context"
+	"encoding/json"
 	// berrors "errors"
 	
 	sparkv1beta2 "github.com/GoogleCloudPlatform/spark-on-k8s-operator/pkg/apis/sparkoperator.k8s.io/v1beta2"
@@ -125,12 +126,14 @@ func (r *ReconcileBatchJob) Reconcile(request reconcile.Request) (reconcile.Resu
 			instanceUpdate.Status.JobState = batchv1beta1.SubmitFailedState
 			return reconcile.Result{}, err
 		}
+		instanceUpdate.Status = batchv1beta1.BatchJobStatus{
+			JobState: batchv1beta1.SubmittedState,
+		}
 		if err := controllerutil.SetControllerReference(instanceUpdate, sparkApp, r.scheme); err != nil {
 			reqLogger.Error(err, "failed to set controller")
 			return reconcile.Result{}, err
 		}
 		instanceUpdate.Status.JobState = batchv1beta1.SubmittedState
-		return reconcile.Result{}, nil
 	case batchv1beta1.RetryState:
 		// TODO: How to retry in this section
 		return reconcile.Result{}, nil
@@ -138,7 +141,7 @@ func (r *ReconcileBatchJob) Reconcile(request reconcile.Request) (reconcile.Resu
 		if err := r.followBatchApplicationState(instanceUpdate); err != nil {
 			return reconcile.Result{}, err
 		}
-		return reconcile.Result{}, nil
+		// return reconcile.Result{}, nil
 	case batchv1beta1.SubmitFailedState:
 		if r.isRetry(instanceUpdate){
 			instanceUpdate.Status.JobState = batchv1beta1.RetryState
@@ -219,9 +222,11 @@ func (r *ReconcileBatchJob) cleanupApps (request reconcile.Request) error {
 
 func (r *ReconcileBatchJob) updateBatchJobStatus (oldapp, newapp *batchv1beta1.BatchJob) error {
 	if equality.Semantic.DeepEqual(oldapp, newapp) {
+		// log.Info("exactly Equal newAPP:")
 		return nil
 	}	
 	err := r.client.Update(context.Background(),newapp)
+	err = r.client.Status().Update(context.Background(),newapp)
 	return err
 }
 
