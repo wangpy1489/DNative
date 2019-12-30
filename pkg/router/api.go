@@ -55,7 +55,7 @@ func (rou *Router) HttpTrigger(w http.ResponseWriter, r *http.Request)  {
 		return
 	}
 	batchJob := &batchv1beta1.BatchJob{}
-	err = rou.kubeclient.Get(context.TODO(),types.NamespacedName{Namespace: httpTrigger.Namespace, Name: httpTrigger.Spec.JobReference.Nmae},batchJob)
+	err = rou.kubeclient.Get(context.TODO(),types.NamespacedName{Namespace: httpTrigger.Namespace, Name: httpTrigger.Spec.JobReference.Name},batchJob)
 	if err != nil {
 		rou.logger.Fatal(err)
 		return

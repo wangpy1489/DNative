@@ -15,6 +15,7 @@ type (
 	TimeService struct {
 		logger *log.Logger
 		kubeclientset client.Client
+		routerUrl string 
 		triggers map[string]*timerTriggerWithCron
 	}
 
@@ -23,11 +24,12 @@ type (
 		cron    *cron.Cron
 	}
 )
-func MakeTimeService(logger *log.Logger, clientset client.Client) *TimeService {
+func MakeTimeService(logger *log.Logger, clientset client.Client, routerUrl string) *TimeService {
 	ts := &TimeService{
 		logger: logger,
 		kubeclientset: clientset,
 		triggers: make(map[string]*timerTriggerWithCron),
+		routerUrl: routerUrl,
 	}
 	go ts.svc()
 	
@@ -76,7 +78,7 @@ func (ts *TimeService) syncCron( triggers *batchv1beta1.TimerTriggerList){
 			}
 			delete(ts.triggers, k)
 		}
-	}
+	}	
 }
 
 func (ts *TimeService) newCron(t batchv1beta1.TimerTrigger) *cron.Cron{
@@ -85,6 +87,7 @@ func (ts *TimeService) newCron(t batchv1beta1.TimerTrigger) *cron.Cron{
 	c.AddFunc(t.Spec.Cron, func() {
 		fmt.Println("test test")
 		ts.logger.Println(fmt.Sprintf("Got the timer:%v with fuction: %v",t.ObjectMeta.Name, t.Spec.JobReference))
+		makeHTTPRequest(ts.routerUrl + "/v1/" + t.Spec.JobReference.Name + "?namespace=" + t.Namespace)
 		// return
 	})
 	c.Start()

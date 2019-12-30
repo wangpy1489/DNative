@@ -29,6 +29,7 @@ func (rou *Router) GetHandler() http.Handler {
 	r := mux.NewRouter()
 	r.HandleFunc("/", rou.HomeHandler).Methods("GET")
 	r.HandleFunc("/v1",rou.CreateHttpTrigger).Methods("POST")
+	r.HandleFunc("/v1/{httpTrigger}",rou.HttpTrigger).Methods("POST")
 	r.HandleFunc("/v1/{httpTrigger}",rou.HttpTrigger).Methods("GET")
 	r.HandleFunc("/v1/{httpTrigger}",rou.UpdateHttpTrigger).Methods("PUT")
 	r.HandleFunc("/v1/{httpTrigger}",rou.DeleteHttpTrigger).Methods("DELETE")

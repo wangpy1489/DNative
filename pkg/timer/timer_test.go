@@ -23,7 +23,7 @@ func TestMakeTimeService(t *testing.T) {
         Spec: batchv1beta1.TimerTriggerSpec{
             Cron: "0 */1 * * * *",
             JobReference: batchv1beta1.JobReference{
-                Name: "test1",
+                Name: "example-httptrigger",
             },
         },
     }
@@ -37,7 +37,7 @@ func TestMakeTimeService(t *testing.T) {
     cl := fake.NewFakeClient(objs...)
    
     var logger = log.New(os.Stdout,"", log.LstdFlags|log.Llongfile)
-    MakeTimeService(logger,cl)
+    MakeTimeService(logger,cl,"localhost:8000")
     // time.Sleep(30 * time.Second)
     for{
 
