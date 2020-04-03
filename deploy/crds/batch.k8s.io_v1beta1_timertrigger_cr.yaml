@@ -4,4 +4,6 @@ metadata:
   name: example-timertrigger
 spec:
   # Add fields here
-  size: 3
+  corn: "0 0 12 * * *"
+  jobref: 
+    name: "example-batchjob"

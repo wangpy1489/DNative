@@ -3,15 +3,19 @@ module github.com/wangpy1489/DNative
 go 1.13
 
 require (
+	cloud.google.com/go v0.40.0 // indirect
 	github.com/GoogleCloudPlatform/spark-on-k8s-operator v0.0.0-20191212214454-c42cc667775b
-	github.com/cweill/gotests v1.5.3 // indirect
-	github.com/fission/fission v1.7.1
+	github.com/emicklei/go-restful v2.9.6+incompatible // indirect
+	github.com/go-logr/logr v0.1.0
 	github.com/go-openapi/spec v0.19.0
 	github.com/gorilla/mux v1.7.0
 	github.com/operator-framework/operator-sdk v0.12.0
-	github.com/robfig/cron v0.0.0-20180505203441-b41be1df6967
+	github.com/robfig/cron v1.2.0
 	github.com/spf13/pflag v1.0.5
-	golang.org/x/tools v0.0.0-20191227053925-7b8e75db28f4 // indirect
+	golang.org/x/crypto v0.0.0-20191011191535-87dc89f01550 // indirect
+	golang.org/x/sys v0.0.0-20191008105621-543471e840be // indirect
+	golang.org/x/xerrors v0.0.0-20191011141410-1b5146add898 // indirect
+	google.golang.org/appengine v1.6.1 // indirect
 	k8s.io/api v0.0.0
 	k8s.io/apimachinery v0.0.0
 	k8s.io/client-go v12.0.0+incompatible

@@ -11,8 +11,11 @@ import (
 	_ "k8s.io/client-go/plugin/pkg/client/auth"
 	"k8s.io/client-go/rest"
 
+	"github.com/go-logr/logr"
 	"github.com/wangpy1489/DNative/pkg/apis"
 	"github.com/wangpy1489/DNative/pkg/controller"
+	"github.com/wangpy1489/DNative/pkg/router"
+	"github.com/wangpy1489/DNative/pkg/timer"
 	"github.com/wangpy1489/DNative/version"
 
 	"github.com/operator-framework/operator-sdk/pkg/k8sutil"
@@ -25,6 +28,7 @@ import (
 	"github.com/spf13/pflag"
 	v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/util/intstr"
+	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/client/config"
 	logf "sigs.k8s.io/controller-runtime/pkg/log"
 	"sigs.k8s.io/controller-runtime/pkg/manager"
@@ -46,6 +50,16 @@ func printVersion() {
 	log.Info(fmt.Sprintf("Version of operator-sdk: %v", sdkVersion.Version))
 }
 
+func runTimer(logger logr.Logger, client client.Client, routerURL string) {
+	log.Info("Starting the Timer.")
+	timer.Start(logger, client, routerURL)
+}
+
+func runRouter(logger logr.Logger, client client.Client, port int) {
+	log.Info("Starting the Router.")
+	router.Start(port, logger, client)
+}
+
 func main() {
 	// Add the zap logger flag set to the CLI. The flag set must
 	// be added before calling pflag.Parse().
@@ -57,6 +71,7 @@ func main() {
 
 	pflag.Parse()
 
+	logger := zap.Logger()
 	// Use a zap logr.Logger implementation. If none of the zap
 	// flags are configured (or if the zap flag set is not being
 	// used), this defaults to a production zap logger.
@@ -65,10 +80,10 @@ func main() {
 	// implementing the logr.Logger interface. This logger will
 	// be propagated through the whole operator, generating
 	// uniform and structured logs.
-	logf.SetLogger(zap.Logger())
+	logf.SetLogger(logger)
 
 	printVersion()
-
+	// logger.Info("Let's Test Logger")
 	namespace, err := k8sutil.GetWatchNamespace()
 	if err != nil {
 		log.Error(err, "Failed to get watch namespace")
@@ -142,6 +157,10 @@ func main() {
 			log.Info("Install prometheus-operator in your cluster to create ServiceMonitor objects", "error", err.Error())
 		}
 	}
+
+	go runRouter(logger, mgr.GetClient(), 8000)
+
+	go runTimer(logger, mgr.GetClient(), "localhost:8000")
 
 	log.Info("Starting the Cmd.")
 
