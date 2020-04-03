@@ -15,15 +15,6 @@ import (
 	"k8s.io/apimachinery/pkg/types"
 )
 
-func (rou *Router) respondWithSuccess(w http.ResponseWriter, resp []byte) error {
-	w.Header().Set("Content-Type", "application/json; charset=utf-8")
-	_, err := w.Write(resp)
-	if err != nil {
-		return err
-	}
-	return nil
-}
-
 func (rou *Router) findHttptrigger(r *http.Request) (*batchv1beta1.HttpTrigger, error) {
 	vars := mux.Vars(r)
 	name := vars["httpTrigger"]
@@ -42,7 +33,7 @@ func (rou *Router) HomeHandler(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte(rou.info))
 }
 
-func (rou *Router) HttpTrigger(w http.ResponseWriter, r *http.Request) {
+func (rou *Router) HttpTriggerApi(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	name := vars["httpTrigger"]
 	namespace := r.URL.Query().Get("namespace")
@@ -72,7 +63,7 @@ func (rou *Router) HttpTrigger(w http.ResponseWriter, r *http.Request) {
 	rou.respondWithSuccess(w, resp)
 }
 
-func (rou *Router) UpdateHttpTrigger(w http.ResponseWriter, r *http.Request) {
+func (rou *Router) HttpTriggerApiUpdate(w http.ResponseWriter, r *http.Request) {
 	body, err := ioutil.ReadAll(r.Body)
 	if err != nil {
 		rou.logger.Error(err, err.Error())
@@ -105,7 +96,7 @@ func (rou *Router) UpdateHttpTrigger(w http.ResponseWriter, r *http.Request) {
 
 }
 
-func (rou *Router) CreateHttpTrigger(w http.ResponseWriter, r *http.Request) {
+func (rou *Router) HttpTriggerApiCreate(w http.ResponseWriter, r *http.Request) {
 	body, err := ioutil.ReadAll(r.Body)
 	if err != nil {
 		rou.logger.Error(err, err.Error())
@@ -143,7 +134,7 @@ func (rou *Router) CreateHttpTrigger(w http.ResponseWriter, r *http.Request) {
 	rou.respondWithSuccess(w, resp)
 }
 
-func (rou *Router) DeleteHttpTrigger(w http.ResponseWriter, r *http.Request) {
+func (rou *Router) HttpTriggerApiDelete(w http.ResponseWriter, r *http.Request) {
 	httptrigger, err := rou.findHttptrigger(r)
 	if err != nil {
 		rou.logger.Error(err, err.Error())
