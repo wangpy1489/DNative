@@ -33,6 +33,21 @@ func (rou *Router) HomeHandler(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte(rou.info))
 }
 
+func (rou *Router) HttpTriggerApiList(w http.ResponseWriter, r *http.Request) {
+	timers := &batchv1beta1.HttpTriggerList{}
+	err := rou.kubeclient.List(context.TODO(), timers)
+	if err != nil {
+		rou.logger.Error(err, err.Error())
+		return
+	}
+	resp, err := json.Marshal(timers)
+	if err != nil {
+		rou.logger.Error(err, err.Error())
+		return
+	}
+	rou.respondWithSuccess(w, resp)
+}
+
 func (rou *Router) HttpTriggerApi(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	name := vars["httpTrigger"]

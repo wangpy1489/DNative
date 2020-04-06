@@ -158,9 +158,9 @@ func main() {
 		}
 	}
 
-	go runRouter(logger, mgr.GetClient(), 8000)
+	go runRouter(logger, mgr.GetClient(), 30518)
 
-	go runTimer(logger, mgr.GetClient(), "localhost:8000")
+	go runTimer(logger, mgr.GetClient(), "localhost:30518")
 
 	log.Info("Starting the Cmd.")
 
