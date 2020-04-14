@@ -112,16 +112,11 @@ func (r *ReconcileBatchJob) Reconcile(request reconcile.Request) (reconcile.Resu
 		return reconcile.Result{}, err
 	}
 
-	// sparkapp := &sparkv1beta2.SparkApplication{}
-	// err = r.client.Get(context.TODO(),request.NamespacedName,sparkapp)
-	// if err != nil {
-	// 	reqLogger.Error(err,"faild to get spark App")
-	// }
-	// log.Info("Now Get sparkAPP:",sparkapp.Name,sparkapp.Spec.Image)
 	instanceUpdate := instance.DeepCopy()
+	jobManager := JobManagerFactory(instanceUpdate.Spec.Type, r.client)
 	switch instanceUpdate.Status.JobState {
 	case batchv1beta1.NewState:
-		sparkApp, err := r.submitBatchJob(instanceUpdate)
+		jobApp, err := jobManager.submitJob(instanceUpdate)
 		if err != nil {
 			instanceUpdate.Status.JobState = batchv1beta1.SubmitFailedState
 			return reconcile.Result{}, err
@@ -129,7 +124,7 @@ func (r *ReconcileBatchJob) Reconcile(request reconcile.Request) (reconcile.Resu
 		instanceUpdate.Status = batchv1beta1.BatchJobStatus{
 			JobState: batchv1beta1.SubmittedState,
 		}
-		if err := controllerutil.SetControllerReference(instanceUpdate, sparkApp, r.scheme); err != nil {
+		if err := controllerutil.SetControllerReference(instanceUpdate, jobApp, r.scheme); err != nil {
 			reqLogger.Error(err, "failed to set controller")
 			return reconcile.Result{}, err
 		}
@@ -138,7 +133,7 @@ func (r *ReconcileBatchJob) Reconcile(request reconcile.Request) (reconcile.Resu
 		// TODO: How to retry in this section
 		return reconcile.Result{}, nil
 	case batchv1beta1.SubmittedState, batchv1beta1.RunningState:
-		if err := r.followBatchApplicationState(instanceUpdate); err != nil {
+		if err := jobManager.followBatchApplicationState(instanceUpdate); err != nil {
 			return reconcile.Result{}, err
 		}
 		// return reconcile.Result{}, nil
@@ -152,7 +147,8 @@ func (r *ReconcileBatchJob) Reconcile(request reconcile.Request) (reconcile.Resu
 	case batchv1beta1.CompletedState:
 		return reconcile.Result{}, nil
 	case batchv1beta1.FailedState:
-		if err := r.deleteBatchJob(instanceUpdate); err != nil {
+		namespacedName := types.NamespacedName{Namespace: instanceUpdate.GetNamespace(), Name: instanceUpdate.GetName()}
+		if err := jobManager.deleteJob(namespacedName); err != nil {
 			return reconcile.Result{}, err
 		}
 		return reconcile.Result{}, nil
@@ -227,87 +223,6 @@ func (r *ReconcileBatchJob) updateBatchJobStatus(oldapp, newapp *batchv1beta1.Ba
 	err := r.client.Update(context.Background(), newapp)
 	err = r.client.Status().Update(context.Background(), newapp)
 	return err
-}
-
-func (r *ReconcileBatchJob) submitBatchJob(job *batchv1beta1.BatchJob) (*sparkv1beta2.SparkApplication, error) {
-	newApp := &sparkv1beta2.SparkApplication{
-		TypeMeta: metav1.TypeMeta{
-			APIVersion: "sparkoperator.k8s.io/v1beta2",
-			Kind:       "Application",
-		},
-		ObjectMeta: metav1.ObjectMeta{
-			Name:      job.Name,
-			Namespace: job.Namespace,
-		},
-		Spec: sparkv1beta2.SparkApplicationSpec{
-			Type:                "Scala",
-			Mode:                "cluster",
-			Image:               &job.Spec.Image,
-			MainClass:           new(string),
-			MainApplicationFile: new(string),
-			Driver: sparkv1beta2.DriverSpec{
-				SparkPodSpec: sparkv1beta2.SparkPodSpec{
-					VolumeMounts: []corev1.VolumeMount{
-						corev1.VolumeMount{
-							Name:      "test-volume",
-							MountPath: "/tmp",
-						},
-					},
-				},
-				ServiceAccount: new(string),
-			},
-			Executor: sparkv1beta2.ExecutorSpec{
-				SparkPodSpec: sparkv1beta2.SparkPodSpec{
-					VolumeMounts: []corev1.VolumeMount{
-						corev1.VolumeMount{
-							Name:      "test-volume",
-							MountPath: "/tmp",
-						},
-					},
-				},
-				Instances: new(int32),
-			},
-		},
-	}
-	*newApp.Spec.MainClass = "org.apache.spark.examples.SparkPi"
-	*newApp.Spec.MainApplicationFile = "local:///opt/spark/examples/jars/spark-examples_2.11-2.4.4.jar"
-	*newApp.Spec.Executor.Instances = 1
-	*newApp.Spec.Driver.ServiceAccount = "sparkoperator-spark"
-	err := r.client.Create(context.TODO(), newApp)
-	// newApp, err := r.sparkClient.Sparkoperator().SparkApplications(job.Namespace).Create(newApp)
-
-	return newApp, err
-}
-
-func (r *ReconcileBatchJob) deleteBatchJob(job *batchv1beta1.BatchJob) error {
-	return nil
-}
-
-func (r *ReconcileBatchJob) followBatchApplicationState(job *batchv1beta1.BatchJob) error {
-	sparkapp := &sparkv1beta2.SparkApplication{}
-	err := r.client.Get(context.TODO(), types.NamespacedName{Namespace: job.Namespace, Name: job.Name}, sparkapp)
-	log.Info("Now Get", "SparkAPP", sparkapp.Kind)
-	if err != nil {
-		if errors.IsNotFound(err) {
-			job.Status.JobState = batchv1beta1.FailedState
-			return nil
-		}
-		log.Error(err, "Problem in Get sparkAPP")
-		return err
-	}
-	if err := r.syncBatchApplication(job, sparkapp); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (r *ReconcileBatchJob) syncBatchApplication(job *batchv1beta1.BatchJob, app *sparkv1beta2.SparkApplication) error {
-	switch job.Status.JobState {
-	case batchv1beta1.RunningState:
-	case batchv1beta1.SubmittedState:
-
-	}
-	return nil
 }
 
 func (r *ReconcileBatchJob) isRetry(job *batchv1beta1.BatchJob) bool {
