@@ -1,20 +1,20 @@
 apiVersion: apiextensions.k8s.io/v1beta1
 kind: CustomResourceDefinition
 metadata:
-  name: timertriggers.batch.k8s.io
+  name: batchtemplates.batch.k8s.io
 spec:
   group: batch.k8s.io
   names:
-    kind: TimerTrigger
-    listKind: TimerTriggerList
-    plural: timertriggers
-    singular: timertrigger
+    kind: BatchTemplate
+    listKind: BatchTemplateList
+    plural: batchtemplates
+    singular: batchtemplate
   scope: Namespaced
   subresources:
     status: {}
   validation:
     openAPIV3Schema:
-      description: TimerTrigger is the Schema for the timertriggers API
+      description: BatchTemplate is the Schema for the batchtemplates API
       properties:
         apiVersion:
           description: 'APIVersion defines the versioned schema of this representation
@@ -29,23 +29,25 @@ spec:
         metadata:
           type: object
         spec:
-          description: TimerTriggerSpec defines the desired state of TimerTrigger
+          description: BatchTemplateSpec defines the desired state of BatchTemplate
           properties:
-            cron:
+            storageName:
               type: string
-            jobref:
-              properties:
-                name:
-                  type: string
-              required:
-              - name
+            template:
               type: object
+            type:
+              description: 'INSERT ADDITIONAL SPEC FIELDS - desired state of cluster
+                Important: Run "operator-sdk generate k8s" to regenerate code after
+                modifying this file Add custom validation using kubebuilder tags:
+                https://book-v1.book.kubebuilder.io/beyond_basics/generating_crd.html'
+              type: string
           required:
-          - cron
-          - jobref
+          - storageName
+          - template
+          - type
           type: object
         status:
-          description: TimerTriggerStatus defines the observed state of TimerTrigger
+          description: BatchTemplateStatus defines the observed state of BatchTemplate
           type: object
       type: object
   version: v1beta1

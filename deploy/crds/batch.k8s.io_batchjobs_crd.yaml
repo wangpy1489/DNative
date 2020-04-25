@@ -31,14 +31,17 @@ spec:
         spec:
           description: BatchJobSpec defines the desired state of BatchJob
           properties:
-            image:
+            template:
+              type: object
+            type:
               description: 'INSERT ADDITIONAL SPEC FIELDS - desired state of cluster
                 Important: Run "operator-sdk generate k8s" to regenerate code after
                 modifying this file Add custom validation using kubebuilder tags:
                 https://book-v1.book.kubebuilder.io/beyond_basics/generating_crd.html'
               type: string
           required:
-          - image
+          - template
+          - type
           type: object
         status:
           description: BatchJobStatus defines the observed state of BatchJob
