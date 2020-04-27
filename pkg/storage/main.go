@@ -4,6 +4,7 @@ import (
 	"context"
 
 	batchv1beta1 "github.com/wangpy1489/DNative/pkg/apis/batch/v1beta1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
 	corev1 "k8s.io/kubernetes/pkg/apis/core"
 	"sigs.k8s.io/controller-runtime/pkg/client"
@@ -11,8 +12,7 @@ import (
 
 // 记录Stroe与APP对应情况
 type StoreCore struct {
-	client  client.Client
-	manager StorageManager
+	client client.Client
 }
 
 func (s *StoreCore) VolumeBuilder(bt batchv1beta1.BatchTemplate, appname string) (*corev1.Volume, error) {
@@ -21,11 +21,11 @@ func (s *StoreCore) VolumeBuilder(bt batchv1beta1.BatchTemplate, appname string)
 	if err != nil {
 		return nil, err
 	}
-	pv, err := s.manager.createPV(ss, appname)
+	pv, err := s.createPV(ss, appname)
 	if err != nil {
 		return nil, err
 	}
-	pvc, err := s.manager.createPVC(pv, appname)
+	pvc, err := s.createPVC(pv, appname)
 	if err != nil {
 		return nil, err
 	}
@@ -40,8 +40,46 @@ func (s *StoreCore) VolumeBuilder(bt batchv1beta1.BatchTemplate, appname string)
 	return volume, nil
 }
 
+func (s *StoreCore) createPV(ss *batchv1beta1.StorageSource, appname string) (*corev1.PersistentVolume, error) {
+	pv := &corev1.PersistentVolume{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      appname + "-pv",
+			Namespace: ss.Namespace,
+		},
+		Spec: corev1.PersistentVolumeSpec{
+			Capacity:               corev1.ResourceList{},
+			PersistentVolumeSource: ss.Spec.Source,
+		},
+	}
+	err := s.client.Create(context.TODO(), pv)
+	if err != nil {
+		return nil, err
+	}
+	return pv, nil
+}
+
+func (s *StoreCore) createPVC(pv *corev1.PersistentVolume, appname string) (*corev1.PersistentVolumeClaim, error) {
+	pvc := &corev1.PersistentVolumeClaim{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      appname + "-pvc",
+			Namespace: pv.Namespace,
+		},
+		Spec: corev1.PersistentVolumeClaimSpec{
+			AccessModes: []corev1.PersistentVolumeAccessMode{corev1.ReadWriteOnce},
+			VolumeName:  pv.Name,
+		},
+	}
+	err := s.client.Create(context.TODO(), pvc)
+	if err != nil {
+		return nil, err
+	}
+	return pvc, nil
+}
+
 // 获取状态 生成具体储存下的结构体
 type StorageManager interface {
+	VolumeBuilder(bt batchv1beta1.BatchTemplate, appname string) (*corev1.Volume, error)
+
 	createPV(ss *batchv1beta1.StorageSource, appname string) (*corev1.PersistentVolume, error)
 
 	createPVC(pv *corev1.PersistentVolume, appname string) (*corev1.PersistentVolumeClaim, error)
