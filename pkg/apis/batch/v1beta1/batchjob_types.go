@@ -27,8 +27,8 @@ const (
 )
 
 type JobTemplete struct {
-	sparkv1.SparkApplicationSpec
-	corev1.PodTemplateSpec
+	Spark sparkv1.SparkApplicationSpec
+	Batch corev1.PodTemplateSpec
 }
 
 type BatchJobState string
