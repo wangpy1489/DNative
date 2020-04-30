@@ -38,7 +38,7 @@ func (m *BatchManger) submitJob(job *batchv1beta1.BatchJob) (metav1.Object, erro
 			Name:      job.Name,
 			Namespace: job.Namespace,
 		},
-		Spec: job.Spec.Templete.Spec,
+		Spec: job.Spec.Templete.Batch.Spec,
 	}
 	err := m.client.Create(context.TODO(), newApp)
 	// Set Memcached instance as the owner and controller

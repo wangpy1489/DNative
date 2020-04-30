@@ -352,7 +352,7 @@ func schema_pkg_apis_batch_v1beta1_StorageSourceSpec(ref common.ReferenceCallbac
 					},
 					"source": {
 						SchemaProps: spec.SchemaProps{
-							Ref: ref("k8s.io/kubernetes/pkg/apis/core.VolumeSource"),
+							Ref: ref("k8s.io/kubernetes/pkg/apis/core.PersistentVolumeSource"),
 						},
 					},
 				},
@@ -360,7 +360,7 @@ func schema_pkg_apis_batch_v1beta1_StorageSourceSpec(ref common.ReferenceCallbac
 			},
 		},
 		Dependencies: []string{
-			"k8s.io/kubernetes/pkg/apis/core.VolumeSource"},
+			"k8s.io/kubernetes/pkg/apis/core.PersistentVolumeSource"},
 	}
 }
 

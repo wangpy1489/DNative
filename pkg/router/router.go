@@ -41,11 +41,18 @@ func (rou *Router) GetHandler() http.Handler {
 	r.HandleFunc("/v1/triggers/timer/{timerTrigger}", rou.TimerTriggerApiUpdate).Methods("PUT")
 	r.HandleFunc("/v1/triggers/timer/{timerTrigger}", rou.TimerTriggerApiDelete).Methods("DELETE")
 
+	r.HandleFunc("/v1/storage", rou.StorageSourceApiList).Methods("Get")
+	r.HandleFunc("/v1/storage", rou.StorageSourceApiCreate).Methods("POST")
+	r.HandleFunc("/v1/storage/{storageSource}", rou.StorageSourceApiGet).Methods("GET")
+	r.HandleFunc("/v1/storage/{storageSource}", rou.StorageSourceApiUpdate).Methods("PUT")
+	r.HandleFunc("/v1/storage/{storageSource}", rou.StorageSourceApiDelete).Methods("DELETE")
+
 	r.HandleFunc("/v1/jobs", rou.BatchJobApiList).Methods("Get")
 	r.HandleFunc("/v1/jobs", rou.BatchJobApiCreate).Methods("POST")
 	r.HandleFunc("/v1/jobs/{batchjob}", rou.BatchJobApiGet).Methods("GET")
 	r.HandleFunc("/v1/jobs/{batchjob}", rou.BatchJobApiUpdate).Methods("PUT")
 	r.HandleFunc("/v1/jobs/{batchjob}", rou.BatchJobApiDelete).Methods("DELETE")
+
 	return r
 }
 

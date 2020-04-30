@@ -32,8 +32,8 @@ spec:
           description: StorageSourceSpec defines the desired state of StorageSource
           properties:
             source:
-              description: VolumeSource represents the source location of a volume
-                to mount. Only one of its members may be specified.
+              description: Similar to VolumeSource but meant for the administrator
+                who creates PVs. Exactly one of its members must be set.
               type: object
             type:
               description: 'INSERT ADDITIONAL SPEC FIELDS - desired state of cluster

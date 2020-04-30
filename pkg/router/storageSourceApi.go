@@ -13,21 +13,21 @@ import (
 	"k8s.io/apimachinery/pkg/types"
 )
 
-func (rou *Router) findTimerTrigger(r *http.Request) (*batchv1beta1.TimerTrigger, error) {
+func (rou *Router) findStorageSource(r *http.Request) (*batchv1beta1.StorageSource, error) {
 	vars := mux.Vars(r)
-	name := vars["timerTrigger"]
+	name := vars["storageSource"]
 	namespace := r.URL.Query().Get("namespace")
-	timerTrigger := &batchv1beta1.TimerTrigger{}
-	err := rou.kubeclient.Get(context.TODO(), types.NamespacedName{Namespace: namespace, Name: name}, timerTrigger)
+	storageSource := &batchv1beta1.StorageSource{}
+	err := rou.kubeclient.Get(context.TODO(), types.NamespacedName{Namespace: namespace, Name: name}, storageSource)
 	if err != nil {
 		rou.logger.Error(err, err.Error())
 		return nil, err
 	}
-	return timerTrigger, nil
+	return storageSource, nil
 }
 
-func (rou *Router) TimerTriggerApiList(w http.ResponseWriter, r *http.Request) {
-	timers := &batchv1beta1.TimerTriggerList{}
+func (rou *Router) StorageSourceApiList(w http.ResponseWriter, r *http.Request) {
+	timers := &batchv1beta1.StorageSourceList{}
 	err := rou.kubeclient.List(context.TODO(), timers)
 	if err != nil {
 		rou.logger.Error(err, err.Error())
@@ -41,18 +41,18 @@ func (rou *Router) TimerTriggerApiList(w http.ResponseWriter, r *http.Request) {
 	rou.respondWithSuccess(w, resp)
 }
 
-func (rou *Router) TimerTriggerApiGet(w http.ResponseWriter, r *http.Request) {
+func (rou *Router) StorageSourceApiGet(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
-	name := vars["timerTrigger"]
+	name := vars["storageSource"]
 	namespace := r.URL.Query().Get("namespace")
-	timerTrigger := &batchv1beta1.TimerTrigger{}
+	storageSource := &batchv1beta1.StorageSource{}
 	rou.logger.Info(namespace, name)
-	err := rou.kubeclient.Get(context.TODO(), types.NamespacedName{Namespace: namespace, Name: name}, timerTrigger)
+	err := rou.kubeclient.Get(context.TODO(), types.NamespacedName{Namespace: namespace, Name: name}, storageSource)
 	if err != nil {
 		rou.logger.Error(err, err.Error())
 		return
 	}
-	resp, err := json.Marshal(timerTrigger)
+	resp, err := json.Marshal(storageSource)
 	if err != nil {
 		rou.logger.Error(err, err.Error())
 		return
@@ -60,20 +60,20 @@ func (rou *Router) TimerTriggerApiGet(w http.ResponseWriter, r *http.Request) {
 	rou.respondWithSuccess(w, resp)
 }
 
-func (rou *Router) TimerTriggerApiCreate(w http.ResponseWriter, r *http.Request) {
+func (rou *Router) StorageSourceApiCreate(w http.ResponseWriter, r *http.Request) {
 	body, err := ioutil.ReadAll(r.Body)
 	if err != nil {
 		rou.logger.Error(err, err.Error())
 		return
 	}
-	var timerTrigger batchv1beta1.TimerTrigger
-	err = json.Unmarshal(body, timerTrigger)
+	var storageSource batchv1beta1.StorageSource
+	err = json.Unmarshal(body, storageSource)
 	if err != nil {
 		rou.logger.Error(err, err.Error())
 		return
 	}
-	triggerFound := &batchv1beta1.TimerTrigger{}
-	err = rou.kubeclient.Get(context.TODO(), types.NamespacedName{Namespace: timerTrigger.Namespace, Name: timerTrigger.Name}, triggerFound)
+	triggerFound := &batchv1beta1.StorageSource{}
+	err = rou.kubeclient.Get(context.TODO(), types.NamespacedName{Namespace: storageSource.Namespace, Name: storageSource.Name}, triggerFound)
 	if err != nil {
 		if !errors.IsNotFound(err) {
 			rou.logger.Error(err, err.Error())
@@ -84,13 +84,13 @@ func (rou *Router) TimerTriggerApiCreate(w http.ResponseWriter, r *http.Request)
 		return
 	}
 
-	err = rou.kubeclient.Create(context.TODO(), &timerTrigger)
+	err = rou.kubeclient.Create(context.TODO(), &storageSource)
 	if err != nil {
 		rou.logger.Error(err, err.Error())
 		return
 	}
 
-	resp, err := json.Marshal(timerTrigger)
+	resp, err := json.Marshal(storageSource)
 	if err != nil {
 		rou.logger.Error(err, err.Error())
 		return
@@ -98,31 +98,31 @@ func (rou *Router) TimerTriggerApiCreate(w http.ResponseWriter, r *http.Request)
 	rou.respondWithSuccess(w, resp)
 }
 
-func (rou *Router) TimerTriggerApiUpdate(w http.ResponseWriter, r *http.Request) {
+func (rou *Router) StorageSourceApiUpdate(w http.ResponseWriter, r *http.Request) {
 	body, err := ioutil.ReadAll(r.Body)
 	if err != nil {
 		rou.logger.Error(err, err.Error())
 		return
 	}
-	var timerTrigger batchv1beta1.TimerTrigger
-	err = json.Unmarshal(body, &timerTrigger)
+	var storageSource batchv1beta1.StorageSource
+	err = json.Unmarshal(body, &storageSource)
 	if err != nil {
 		rou.logger.Error(err, err.Error())
 		return
 	}
-	triggerFound := &batchv1beta1.TimerTrigger{}
-	err = rou.kubeclient.Get(context.TODO(), types.NamespacedName{Namespace: timerTrigger.Namespace, Name: timerTrigger.Name}, triggerFound)
+	triggerFound := &batchv1beta1.StorageSource{}
+	err = rou.kubeclient.Get(context.TODO(), types.NamespacedName{Namespace: storageSource.Namespace, Name: storageSource.Name}, triggerFound)
 	if err != nil {
 		rou.logger.Error(err, err.Error())
 		return
 	}
-	err = rou.kubeclient.Update(context.TODO(), &timerTrigger)
+	err = rou.kubeclient.Update(context.TODO(), &storageSource)
 	if err != nil {
 		rou.logger.Error(err, err.Error())
 		return
 	}
 
-	resp, err := json.Marshal(timerTrigger)
+	resp, err := json.Marshal(storageSource)
 	if err != nil {
 		rou.logger.Error(err, err.Error())
 		return
@@ -131,18 +131,18 @@ func (rou *Router) TimerTriggerApiUpdate(w http.ResponseWriter, r *http.Request)
 
 }
 
-func (rou *Router) TimerTriggerApiDelete(w http.ResponseWriter, r *http.Request) {
-	timerTrigger, err := rou.findTimerTrigger(r)
+func (rou *Router) StorageSourceApiDelete(w http.ResponseWriter, r *http.Request) {
+	storageSource, err := rou.findStorageSource(r)
 	if err != nil {
 		rou.logger.Error(err, err.Error())
 		return
 	}
-	err = rou.kubeclient.Delete(context.TODO(), timerTrigger)
+	err = rou.kubeclient.Delete(context.TODO(), storageSource)
 	if err != nil {
 		rou.logger.Error(err, err.Error())
 		return
 	}
 
-	resp, err := json.Marshal(timerTrigger)
+	resp, err := json.Marshal(storageSource)
 	rou.respondWithSuccess(w, resp)
 }
