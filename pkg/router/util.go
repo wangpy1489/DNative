@@ -10,3 +10,12 @@ func (rou *Router) respondWithSuccess(w http.ResponseWriter, resp []byte) error 
 	}
 	return nil
 }
+
+func (rou *Router) respondWithError(w http.ResponseWriter, in_err error) error {
+	w.Header().Set("Content-Type", "text/plain; charset=utf-8")
+	_, err := w.Write([]byte(in_err.Error()))
+	if err != nil {
+		return err
+	}
+	return nil
+}

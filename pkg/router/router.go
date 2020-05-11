@@ -47,11 +47,17 @@ func (rou *Router) GetHandler() http.Handler {
 	r.HandleFunc("/v1/storage/{storageSource}", rou.StorageSourceApiUpdate).Methods("PUT")
 	r.HandleFunc("/v1/storage/{storageSource}", rou.StorageSourceApiDelete).Methods("DELETE")
 
+	r.HandleFunc("/v1/templates", rou.BatchTemplateApiList).Methods("Get")
+	r.HandleFunc("/v1/templates", rou.BatchTemplateApiCreate).Methods("POST")
+	r.HandleFunc("/v1/templates/{batchTemplate}", rou.BatchTemplateApiGet).Methods("GET")
+	r.HandleFunc("/v1/templates/{batchTemplate}", rou.BatchTemplateApiUpdate).Methods("PUT")
+	r.HandleFunc("/v1/templates/{batchTemplate}", rou.BatchTemplateApiDelete).Methods("DELETE")
+
 	r.HandleFunc("/v1/jobs", rou.BatchJobApiList).Methods("Get")
 	r.HandleFunc("/v1/jobs", rou.BatchJobApiCreate).Methods("POST")
-	r.HandleFunc("/v1/jobs/{batchjob}", rou.BatchJobApiGet).Methods("GET")
-	r.HandleFunc("/v1/jobs/{batchjob}", rou.BatchJobApiUpdate).Methods("PUT")
-	r.HandleFunc("/v1/jobs/{batchjob}", rou.BatchJobApiDelete).Methods("DELETE")
+	r.HandleFunc("/v1/jobs/{batchJob}", rou.BatchJobApiGet).Methods("GET")
+	r.HandleFunc("/v1/jobs/{batchJob}", rou.BatchJobApiUpdate).Methods("PUT")
+	r.HandleFunc("/v1/jobs/{batchJob}", rou.BatchJobApiDelete).Methods("DELETE")
 
 	return r
 }

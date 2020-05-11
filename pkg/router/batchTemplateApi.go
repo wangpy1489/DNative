@@ -13,21 +13,21 @@ import (
 	"k8s.io/apimachinery/pkg/types"
 )
 
-func (rou *Router) findStorageSource(r *http.Request) (*batchv1beta1.StorageSource, error) {
+func (rou *Router) findBatchTemplate(r *http.Request) (*batchv1beta1.BatchTemplate, error) {
 	vars := mux.Vars(r)
-	name := vars["storageSource"]
+	name := vars["batchTemplate"]
 	namespace := r.URL.Query().Get("namespace")
-	storageSource := &batchv1beta1.StorageSource{}
-	err := rou.kubeclient.Get(context.TODO(), types.NamespacedName{Namespace: namespace, Name: name}, storageSource)
+	batchTemplate := &batchv1beta1.BatchTemplate{}
+	err := rou.kubeclient.Get(context.TODO(), types.NamespacedName{Namespace: namespace, Name: name}, batchTemplate)
 	if err != nil {
 		rou.logger.Error(err, err.Error())
 		return nil, err
 	}
-	return storageSource, nil
+	return batchTemplate, nil
 }
 
-func (rou *Router) StorageSourceApiList(w http.ResponseWriter, r *http.Request) {
-	timers := &batchv1beta1.StorageSourceList{}
+func (rou *Router) BatchTemplateApiList(w http.ResponseWriter, r *http.Request) {
+	timers := &batchv1beta1.BatchTemplateList{}
 	err := rou.kubeclient.List(context.TODO(), timers)
 	if err != nil {
 		rou.logger.Error(err, err.Error())
@@ -43,19 +43,19 @@ func (rou *Router) StorageSourceApiList(w http.ResponseWriter, r *http.Request) 
 	rou.respondWithSuccess(w, resp)
 }
 
-func (rou *Router) StorageSourceApiGet(w http.ResponseWriter, r *http.Request) {
+func (rou *Router) BatchTemplateApiGet(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
-	name := vars["storageSource"]
+	name := vars["batchTemplate"]
 	namespace := r.URL.Query().Get("namespace")
-	storageSource := &batchv1beta1.StorageSource{}
+	batchTemplate := &batchv1beta1.BatchTemplate{}
 	rou.logger.Info(namespace, name)
-	err := rou.kubeclient.Get(context.TODO(), types.NamespacedName{Namespace: namespace, Name: name}, storageSource)
+	err := rou.kubeclient.Get(context.TODO(), types.NamespacedName{Namespace: namespace, Name: name}, batchTemplate)
 	if err != nil {
 		rou.logger.Error(err, err.Error())
 		rou.respondWithError(w, err)
 		return
 	}
-	resp, err := json.Marshal(storageSource)
+	resp, err := json.Marshal(batchTemplate)
 	if err != nil {
 		rou.logger.Error(err, err.Error())
 		rou.respondWithError(w, err)
@@ -64,22 +64,22 @@ func (rou *Router) StorageSourceApiGet(w http.ResponseWriter, r *http.Request) {
 	rou.respondWithSuccess(w, resp)
 }
 
-func (rou *Router) StorageSourceApiCreate(w http.ResponseWriter, r *http.Request) {
+func (rou *Router) BatchTemplateApiCreate(w http.ResponseWriter, r *http.Request) {
 	body, err := ioutil.ReadAll(r.Body)
 	if err != nil {
 		rou.logger.Error(err, err.Error())
 		rou.respondWithError(w, err)
 		return
 	}
-	storageSource := batchv1beta1.StorageSource{}
-	err = json.Unmarshal(body, &storageSource)
+	batchTemplate := batchv1beta1.BatchTemplate{}
+	err = json.Unmarshal(body, &batchTemplate)
 	if err != nil {
 		rou.logger.Error(err, err.Error())
 		rou.respondWithError(w, err)
 		return
 	}
-	triggerFound := &batchv1beta1.StorageSource{}
-	err = rou.kubeclient.Get(context.TODO(), types.NamespacedName{Namespace: storageSource.Namespace, Name: storageSource.Name}, triggerFound)
+	triggerFound := &batchv1beta1.BatchTemplate{}
+	err = rou.kubeclient.Get(context.TODO(), types.NamespacedName{Namespace: batchTemplate.Namespace, Name: batchTemplate.Name}, triggerFound)
 	if err != nil {
 		if !errors.IsNotFound(err) {
 			rou.logger.Error(err, err.Error())
@@ -92,14 +92,14 @@ func (rou *Router) StorageSourceApiCreate(w http.ResponseWriter, r *http.Request
 		return
 	}
 
-	err = rou.kubeclient.Create(context.TODO(), &storageSource)
+	err = rou.kubeclient.Create(context.TODO(), &batchTemplate)
 	if err != nil {
 		rou.logger.Error(err, err.Error())
 		rou.respondWithError(w, err)
 		return
 	}
 
-	resp, err := json.Marshal(storageSource)
+	resp, err := json.Marshal(batchTemplate)
 	if err != nil {
 		rou.logger.Error(err, err.Error())
 		rou.respondWithError(w, err)
@@ -108,28 +108,28 @@ func (rou *Router) StorageSourceApiCreate(w http.ResponseWriter, r *http.Request
 	rou.respondWithSuccess(w, resp)
 }
 
-func (rou *Router) StorageSourceApiUpdate(w http.ResponseWriter, r *http.Request) {
+func (rou *Router) BatchTemplateApiUpdate(w http.ResponseWriter, r *http.Request) {
 	body, err := ioutil.ReadAll(r.Body)
 	if err != nil {
 		rou.logger.Error(err, err.Error())
 		rou.respondWithError(w, err)
 		return
 	}
-	storageSource := batchv1beta1.StorageSource{}
-	err = json.Unmarshal(body, &storageSource)
+	batchTemplate := batchv1beta1.BatchTemplate{}
+	err = json.Unmarshal(body, &batchTemplate)
 	if err != nil {
 		rou.logger.Error(err, err.Error())
 		rou.respondWithError(w, err)
 		return
 	}
-	triggerFound := &batchv1beta1.StorageSource{}
-	err = rou.kubeclient.Get(context.TODO(), types.NamespacedName{Namespace: storageSource.Namespace, Name: storageSource.Name}, triggerFound)
+	triggerFound := &batchv1beta1.BatchTemplate{}
+	err = rou.kubeclient.Get(context.TODO(), types.NamespacedName{Namespace: batchTemplate.Namespace, Name: batchTemplate.Name}, triggerFound)
 	if err != nil {
 		rou.logger.Error(err, err.Error())
 		rou.respondWithError(w, err)
 		return
 	}
-	triggerFound.Spec = triggerFound.Spec
+	triggerFound.Spec = batchTemplate.Spec
 	err = rou.kubeclient.Update(context.TODO(), triggerFound)
 	if err != nil {
 		rou.logger.Error(err, err.Error())
@@ -137,30 +137,28 @@ func (rou *Router) StorageSourceApiUpdate(w http.ResponseWriter, r *http.Request
 		return
 	}
 
-	resp, err := json.Marshal(storageSource)
+	resp, err := json.Marshal(batchTemplate)
 	if err != nil {
 		rou.logger.Error(err, err.Error())
-		rou.respondWithError(w, err)
 		return
 	}
 	rou.respondWithSuccess(w, resp)
 
 }
 
-func (rou *Router) StorageSourceApiDelete(w http.ResponseWriter, r *http.Request) {
-	storageSource, err := rou.findStorageSource(r)
+func (rou *Router) BatchTemplateApiDelete(w http.ResponseWriter, r *http.Request) {
+	batchTemplate, err := rou.findBatchTemplate(r)
 	if err != nil {
 		rou.logger.Error(err, err.Error())
-		rou.respondWithError(w, err)
 		return
 	}
-	err = rou.kubeclient.Delete(context.TODO(), storageSource)
+	err = rou.kubeclient.Delete(context.TODO(), batchTemplate)
 	if err != nil {
 		rou.logger.Error(err, err.Error())
 		rou.respondWithError(w, err)
 		return
 	}
 
-	resp, err := json.Marshal(storageSource)
+	resp, err := json.Marshal(batchTemplate)
 	rou.respondWithSuccess(w, resp)
 }

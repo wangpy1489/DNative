@@ -38,11 +38,13 @@ func (rou *Router) HttpTriggerApiList(w http.ResponseWriter, r *http.Request) {
 	err := rou.kubeclient.List(context.TODO(), timers)
 	if err != nil {
 		rou.logger.Error(err, err.Error())
+		rou.respondWithError(w, err)
 		return
 	}
 	resp, err := json.Marshal(timers)
 	if err != nil {
 		rou.logger.Error(err, err.Error())
+		rou.respondWithError(w, err)
 		return
 	}
 	rou.respondWithSuccess(w, resp)
@@ -57,22 +59,26 @@ func (rou *Router) HttpTriggerApi(w http.ResponseWriter, r *http.Request) {
 	err := rou.kubeclient.Get(context.TODO(), types.NamespacedName{Namespace: namespace, Name: name}, httpTrigger)
 	if err != nil {
 		rou.logger.Error(err, err.Error())
+		rou.respondWithError(w, err)
 		return
 	}
 	batchJob := &batchv1beta1.BatchJob{}
 	err = rou.kubeclient.Get(context.TODO(), types.NamespacedName{Namespace: httpTrigger.Namespace, Name: httpTrigger.Spec.JobReference.Name}, batchJob)
 	if err != nil {
 		rou.logger.Error(err, err.Error())
+		rou.respondWithError(w, err)
 		return
 	}
 	sparkapp, err := resource.SubmitBatchJob(rou.kubeclient, batchJob)
 	if err != nil {
 		rou.logger.Error(err, err.Error())
+		rou.respondWithError(w, err)
 		return
 	}
 	resp, err := json.Marshal(sparkapp)
 	if err != nil {
 		rou.logger.Error(err, err.Error())
+		rou.respondWithError(w, err)
 		return
 	}
 	rou.respondWithSuccess(w, resp)
@@ -82,29 +88,35 @@ func (rou *Router) HttpTriggerApiUpdate(w http.ResponseWriter, r *http.Request) 
 	body, err := ioutil.ReadAll(r.Body)
 	if err != nil {
 		rou.logger.Error(err, err.Error())
+		rou.respondWithError(w, err)
 		return
 	}
-	var httptrigger batchv1beta1.HttpTrigger
-	err = json.Unmarshal(body, httptrigger)
+	httptrigger := batchv1beta1.HttpTrigger{}
+	err = json.Unmarshal(body, &httptrigger)
 	if err != nil {
 		rou.logger.Error(err, err.Error())
+		rou.respondWithError(w, err)
 		return
 	}
 	triggerFound := &batchv1beta1.HttpTrigger{}
 	err = rou.kubeclient.Get(context.TODO(), types.NamespacedName{Namespace: httptrigger.Namespace, Name: httptrigger.Name}, triggerFound)
 	if err != nil {
 		rou.logger.Error(err, err.Error())
+		rou.respondWithError(w, err)
 		return
 	}
-	err = rou.kubeclient.Update(context.TODO(), &httptrigger)
+	triggerFound.Spec = httptrigger.Spec
+	err = rou.kubeclient.Update(context.TODO(), triggerFound)
 	if err != nil {
 		rou.logger.Error(err, err.Error())
+		rou.respondWithError(w, err)
 		return
 	}
 
 	resp, err := json.Marshal(httptrigger)
 	if err != nil {
 		rou.logger.Error(err, err.Error())
+		rou.respondWithError(w, err)
 		return
 	}
 	rou.respondWithSuccess(w, resp)
@@ -115,12 +127,14 @@ func (rou *Router) HttpTriggerApiCreate(w http.ResponseWriter, r *http.Request) 
 	body, err := ioutil.ReadAll(r.Body)
 	if err != nil {
 		rou.logger.Error(err, err.Error())
+		rou.respondWithError(w, err)
 		return
 	}
-	var httptrigger batchv1beta1.HttpTrigger
-	err = json.Unmarshal(body, httptrigger)
+	httptrigger := batchv1beta1.HttpTrigger{}
+	err = json.Unmarshal(body, &httptrigger)
 	if err != nil {
 		rou.logger.Error(err, err.Error())
+		rou.respondWithError(w, err)
 		return
 	}
 	triggerFound := &batchv1beta1.HttpTrigger{}
@@ -128,22 +142,26 @@ func (rou *Router) HttpTriggerApiCreate(w http.ResponseWriter, r *http.Request) 
 	if err != nil {
 		if !errors.IsNotFound(err) {
 			rou.logger.Error(err, err.Error())
+			rou.respondWithError(w, err)
 			return
 		}
 	} else if triggerFound != nil {
 		rou.logger.Error(fmt.Errorf("%s", "HTTP Trigger already existed."), "Existed")
+		rou.respondWithError(w, err)
 		return
 	}
 
 	err = rou.kubeclient.Create(context.TODO(), &httptrigger)
 	if err != nil {
 		rou.logger.Error(err, err.Error())
+		rou.respondWithError(w, err)
 		return
 	}
 
 	resp, err := json.Marshal(httptrigger)
 	if err != nil {
 		rou.logger.Error(err, err.Error())
+		rou.respondWithError(w, err)
 		return
 	}
 	rou.respondWithSuccess(w, resp)
@@ -153,11 +171,13 @@ func (rou *Router) HttpTriggerApiDelete(w http.ResponseWriter, r *http.Request) 
 	httptrigger, err := rou.findHttptrigger(r)
 	if err != nil {
 		rou.logger.Error(err, err.Error())
+		rou.respondWithError(w, err)
 		return
 	}
 	err = rou.kubeclient.Delete(context.TODO(), httptrigger)
 	if err != nil {
 		rou.logger.Error(err, err.Error())
+		rou.respondWithError(w, err)
 		return
 	}
 
