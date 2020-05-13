@@ -7,11 +7,11 @@ import (
 
 	"github.com/wangpy1489/DNative/pkg/apis"
 	batchv1beta1 "github.com/wangpy1489/DNative/pkg/apis/batch/v1beta1"
+	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/client-go/kubernetes/scheme"
-	corev1 "k8s.io/kubernetes/pkg/apis/core"
 	"sigs.k8s.io/controller-runtime/pkg/client/fake"
 )
 
@@ -38,7 +38,7 @@ func TestStorageManager(t *testing.T) {
 		},
 		Spec: batchv1beta1.BatchTemplateSpec{
 			Type: batchv1beta1.Batch,
-			Templete: batchv1beta1.JobTemplete{
+			Template: batchv1beta1.JobTemplate{
 				Batch: corev1.PodTemplateSpec{
 					Spec: corev1.PodSpec{
 						Containers: []corev1.Container{

@@ -115,8 +115,8 @@ func (rou *Router) BatchTemplateApiUpdate(w http.ResponseWriter, r *http.Request
 		rou.respondWithError(w, err)
 		return
 	}
-	batchTemplate := batchv1beta1.BatchTemplate{}
-	err = json.Unmarshal(body, &batchTemplate)
+	batchTemplate := &batchv1beta1.BatchTemplate{}
+	err = json.Unmarshal(body, batchTemplate)
 	if err != nil {
 		rou.logger.Error(err, err.Error())
 		rou.respondWithError(w, err)
@@ -130,6 +130,7 @@ func (rou *Router) BatchTemplateApiUpdate(w http.ResponseWriter, r *http.Request
 		return
 	}
 	triggerFound.Spec = batchTemplate.Spec
+	// rou.logger.Info("now", "Update", batchTemplate, "origin", triggerFound, "json", string(body))
 	err = rou.kubeclient.Update(context.TODO(), triggerFound)
 	if err != nil {
 		rou.logger.Error(err, err.Error())

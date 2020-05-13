@@ -21,7 +21,7 @@ func (m *SparkManger) submitJob(job *batchv1beta1.BatchJob) (metav1.Object, erro
 			Name:      job.Name,
 			Namespace: job.Namespace,
 		},
-		Spec: job.Spec.Templete.Spark,
+		Spec: job.Spec.Template.Spark,
 	}
 	err := m.client.Create(context.TODO(), newApp)
 	return newApp, err

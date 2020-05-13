@@ -2,8 +2,8 @@ package v1beta1
 
 import (
 	sparkv1 "github.com/GoogleCloudPlatform/spark-on-k8s-operator/pkg/apis/sparkoperator.k8s.io/v1beta2"
+	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	corev1 "k8s.io/kubernetes/pkg/apis/core"
 )
 
 // EDIT THIS FILE!  THIS IS SCAFFOLDING FOR YOU TO OWN!
@@ -16,7 +16,7 @@ type BatchJobSpec struct {
 	// Important: Run "operator-sdk generate k8s" to regenerate code after modifying this file
 	// Add custom validation using kubebuilder tags: https://book-v1.book.kubebuilder.io/beyond_basics/generating_crd.html
 	Type     BatchJobType `json:"type"`
-	Templete JobTemplete  `json:"template"`
+	Template JobTemplate  `json:"template"`
 }
 
 type BatchJobType string
@@ -26,7 +26,7 @@ const (
 	Spark BatchJobType = "spark"
 )
 
-type JobTemplete struct {
+type JobTemplate struct {
 	Spark sparkv1.SparkApplicationSpec
 	Batch corev1.PodTemplateSpec
 }

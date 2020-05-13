@@ -4,15 +4,21 @@ import (
 	"context"
 
 	batchv1beta1 "github.com/wangpy1489/DNative/pkg/apis/batch/v1beta1"
+	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
-	corev1 "k8s.io/kubernetes/pkg/apis/core"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
 // 记录Stroe与APP对应情况
 type StoreCore struct {
 	client client.Client
+}
+
+func MakeSotreCore(client client.Client) *StoreCore {
+	return &StoreCore{
+		client: client,
+	}
 }
 
 func (s *StoreCore) VolumeBuilder(bt batchv1beta1.BatchTemplate, appname string) (*corev1.Volume, error) {

@@ -4,10 +4,10 @@ import (
 	"context"
 
 	batchv1beta1 "github.com/wangpy1489/DNative/pkg/apis/batch/v1beta1"
+	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
-	corev1 "k8s.io/kubernetes/pkg/apis/core"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
@@ -38,7 +38,7 @@ func (m *BatchManger) submitJob(job *batchv1beta1.BatchJob) (metav1.Object, erro
 			Name:      job.Name,
 			Namespace: job.Namespace,
 		},
-		Spec: job.Spec.Templete.Batch.Spec,
+		Spec: job.Spec.Template.Batch.Spec,
 	}
 	err := m.client.Create(context.TODO(), newApp)
 	// Set Memcached instance as the owner and controller

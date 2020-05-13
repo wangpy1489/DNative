@@ -1,0 +1,109 @@
+{
+    "apiVersion": "sparkoperator.k8s.io/v1beta2",
+    "kind": "SparkApplication",
+    "metadata": {
+      "name": "spark-pi",
+      "namespace": "default"
+    },
+    "spec": {
+      "type": "Scala",
+      "mode": "cluster",
+      "image": "gcr.io/spark-operator/spark:v2.4.4",
+      "mainClass": "org.apache.spark.examples.SparkPi",
+      "mainApplicationFile": "local:///opt/spark/examples/jars/spark-examples_2.11-2.4.4.jar",
+      "sparkVersion": "2.4.4",
+      "restartPolicy": {
+        "type": "Never"
+      },
+      "volumes": [
+        {
+          "name": "test-volume",
+          "hostPath": {
+            "path": "/tmp",
+            "type": "Directory"
+          }
+        }
+      ],
+      "driver": {
+        "cores": 1,
+        "coreLimit": "1200m",
+        "memory": "512m",
+        "labels": {
+          "version": "2.4.4"
+        },
+        "serviceAccount": "sparkoperator-spark",
+        "volumeMounts": [
+          {
+            "name": "test-volume",
+            "mountPath": "/tmp"
+          }
+        ]
+      },
+      "executor": {
+        "cores": 1,
+        "instances": 1,
+        "memory": "512m",
+        "labels": {
+          "version": "2.4.4"
+        },
+        "volumeMounts": [
+          {
+            "name": "test-volume",
+            "mountPath": "/tmp"
+          }
+        ]
+      }
+    }
+  }
+
+//   image := "gcr.io/spark-operator/spark:v2.4.4"
+// 	newApp := &sparkv1beta2.SparkApplication{
+// 		TypeMeta: metav1.TypeMeta{
+// 			APIVersion: "sparkoperator.k8s.io/v1beta2",
+// 			Kind:       "Application",
+// 		},
+// 		ObjectMeta: metav1.ObjectMeta{
+// 			Name:      job.Name,
+// 			Namespace: job.Namespace,
+// 		},
+// 		Spec: sparkv1beta2.SparkApplicationSpec{
+// 			Type:                "Scala",
+// 			Mode:                "cluster",
+// 			Image:               &image,
+// 			MainClass:           new(string),
+// 			MainApplicationFile: new(string),
+// 			Driver: sparkv1beta2.DriverSpec{
+// 				SparkPodSpec: sparkv1beta2.SparkPodSpec{
+// 					VolumeMounts: []corev1.VolumeMount{
+// 						corev1.VolumeMount{
+// 							Name:      "test-volume",
+// 							MountPath: "/tmp",
+// 						},
+// 					},
+// 				},
+// 				ServiceAccount: new(string),
+// 			},
+// 			Executor: sparkv1beta2.ExecutorSpec{
+// 				SparkPodSpec: sparkv1beta2.SparkPodSpec{
+// 					VolumeMounts: []corev1.VolumeMount{
+// 						corev1.VolumeMount{
+// 							Name:      "test-volume",
+// 							MountPath: "/tmp",
+// 						},
+// 					},
+// 				},
+// 				Instances: new(int32),
+// 			},
+// 		},
+// 	}
+// 	*newApp.Spec.MainClass = "org.apache.spark.examples.SparkPi"
+// 	*newApp.Spec.MainApplicationFile = "local:///opt/spark/examples/jars/spark-examples_2.11-2.4.4.jar"
+// 	*newApp.Spec.Executor.Instances = 1
+// 	*newApp.Spec.Driver.ServiceAccount = "sparkoperator-spark"
+// 	err := kubeclient.Create(context.TODO(), newApp)
+// 	if err != nil {
+// 		return nil, err
+// 	}
+// 	// newApp, err := r.sparkClient.Sparkoperator().SparkApplications(job.Namespace).Create(newApp)
+
+// 	return newApp, nil

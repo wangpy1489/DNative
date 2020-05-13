@@ -14,7 +14,7 @@ type BatchTemplateSpec struct {
 	// Important: Run "operator-sdk generate k8s" to regenerate code after modifying this file
 	// Add custom validation using kubebuilder tags: https://book-v1.book.kubebuilder.io/beyond_basics/generating_crd.html
 	Type        BatchJobType `json:"type"`
-	Templete    JobTemplete  `json:"template"`
+	Template    JobTemplate  `json:"template"`
 	StorageName string       `json:"storageName"`
 }
 

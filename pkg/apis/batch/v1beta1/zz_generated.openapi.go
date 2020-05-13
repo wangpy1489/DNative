@@ -89,7 +89,7 @@ func schema_pkg_apis_batch_v1beta1_BatchJobSpec(ref common.ReferenceCallback) co
 					},
 					"template": {
 						SchemaProps: spec.SchemaProps{
-							Ref: ref("github.com/wangpy1489/DNative/pkg/apis/batch/v1beta1.JobTemplete"),
+							Ref: ref("github.com/wangpy1489/DNative/pkg/apis/batch/v1beta1.JobTemplate"),
 						},
 					},
 				},
@@ -97,7 +97,7 @@ func schema_pkg_apis_batch_v1beta1_BatchJobSpec(ref common.ReferenceCallback) co
 			},
 		},
 		Dependencies: []string{
-			"github.com/wangpy1489/DNative/pkg/apis/batch/v1beta1.JobTemplete"},
+			"github.com/wangpy1489/DNative/pkg/apis/batch/v1beta1.JobTemplate"},
 	}
 }
 
@@ -181,7 +181,7 @@ func schema_pkg_apis_batch_v1beta1_BatchTemplateSpec(ref common.ReferenceCallbac
 					},
 					"template": {
 						SchemaProps: spec.SchemaProps{
-							Ref: ref("github.com/wangpy1489/DNative/pkg/apis/batch/v1beta1.JobTemplete"),
+							Ref: ref("github.com/wangpy1489/DNative/pkg/apis/batch/v1beta1.JobTemplate"),
 						},
 					},
 					"storageName": {
@@ -195,7 +195,7 @@ func schema_pkg_apis_batch_v1beta1_BatchTemplateSpec(ref common.ReferenceCallbac
 			},
 		},
 		Dependencies: []string{
-			"github.com/wangpy1489/DNative/pkg/apis/batch/v1beta1.JobTemplete"},
+			"github.com/wangpy1489/DNative/pkg/apis/batch/v1beta1.JobTemplate"},
 	}
 }
 
@@ -352,7 +352,7 @@ func schema_pkg_apis_batch_v1beta1_StorageSourceSpec(ref common.ReferenceCallbac
 					},
 					"source": {
 						SchemaProps: spec.SchemaProps{
-							Ref: ref("k8s.io/kubernetes/pkg/apis/core.PersistentVolumeSource"),
+							Ref: ref("k8s.io/api/core/v1.PersistentVolumeSource"),
 						},
 					},
 				},
@@ -360,7 +360,7 @@ func schema_pkg_apis_batch_v1beta1_StorageSourceSpec(ref common.ReferenceCallbac
 			},
 		},
 		Dependencies: []string{
-			"k8s.io/kubernetes/pkg/apis/core.PersistentVolumeSource"},
+			"k8s.io/api/core/v1.PersistentVolumeSource"},
 	}
 }
 
