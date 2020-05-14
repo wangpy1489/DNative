@@ -184,18 +184,17 @@ func schema_pkg_apis_batch_v1beta1_BatchTemplateSpec(ref common.ReferenceCallbac
 							Ref: ref("github.com/wangpy1489/DNative/pkg/apis/batch/v1beta1.JobTemplate"),
 						},
 					},
-					"storageName": {
+					"storageInfo": {
 						SchemaProps: spec.SchemaProps{
-							Type:   []string{"string"},
-							Format: "",
+							Ref: ref("github.com/wangpy1489/DNative/pkg/apis/batch/v1beta1.StroageInfo"),
 						},
 					},
 				},
-				Required: []string{"type", "template", "storageName"},
+				Required: []string{"type", "template", "storageInfo"},
 			},
 		},
 		Dependencies: []string{
-			"github.com/wangpy1489/DNative/pkg/apis/batch/v1beta1.JobTemplate"},
+			"github.com/wangpy1489/DNative/pkg/apis/batch/v1beta1.JobTemplate", "github.com/wangpy1489/DNative/pkg/apis/batch/v1beta1.StroageInfo"},
 	}
 }
 
@@ -355,12 +354,25 @@ func schema_pkg_apis_batch_v1beta1_StorageSourceSpec(ref common.ReferenceCallbac
 							Ref: ref("k8s.io/api/core/v1.PersistentVolumeSource"),
 						},
 					},
+					"Capacity": {
+						SchemaProps: spec.SchemaProps{
+							Type: []string{"object"},
+							AdditionalProperties: &spec.SchemaOrBool{
+								Allows: true,
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Ref: ref("k8s.io/apimachinery/pkg/api/resource.Quantity"),
+									},
+								},
+							},
+						},
+					},
 				},
-				Required: []string{"type", "source"},
+				Required: []string{"type", "source", "Capacity"},
 			},
 		},
 		Dependencies: []string{
-			"k8s.io/api/core/v1.PersistentVolumeSource"},
+			"k8s.io/api/core/v1.PersistentVolumeSource", "k8s.io/apimachinery/pkg/api/resource.Quantity"},
 	}
 }
 

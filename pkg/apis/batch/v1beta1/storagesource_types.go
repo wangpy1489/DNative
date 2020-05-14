@@ -14,8 +14,9 @@ type StorageSourceSpec struct {
 	// INSERT ADDITIONAL SPEC FIELDS - desired state of cluster
 	// Important: Run "operator-sdk generate k8s" to regenerate code after modifying this file
 	// Add custom validation using kubebuilder tags: https://book-v1.book.kubebuilder.io/beyond_basics/generating_crd.html
-	Type   string                        `json:"type"`
-	Source corev1.PersistentVolumeSource `json:"source"`
+	Type     string                        `json:"type"`
+	Source   corev1.PersistentVolumeSource `json:"source"`
+	Capacity corev1.ResourceList           `json:"capacity`
 }
 
 // StorageSourceStatus defines the observed state of StorageSource

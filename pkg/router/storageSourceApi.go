@@ -129,7 +129,7 @@ func (rou *Router) StorageSourceApiUpdate(w http.ResponseWriter, r *http.Request
 		rou.respondWithError(w, err)
 		return
 	}
-	triggerFound.Spec = triggerFound.Spec
+	triggerFound.Spec = storageSource.Spec
 	err = rou.kubeclient.Update(context.TODO(), triggerFound)
 	if err != nil {
 		rou.logger.Error(err, err.Error())

@@ -1,6 +1,9 @@
 package router
 
-import "net/http"
+import (
+	"net/http"
+	"time"
+)
 
 func (rou *Router) respondWithSuccess(w http.ResponseWriter, resp []byte) error {
 	w.Header().Set("Content-Type", "application/json; charset=utf-8")
@@ -18,4 +21,9 @@ func (rou *Router) respondWithError(w http.ResponseWriter, in_err error) error {
 		return err
 	}
 	return nil
+}
+
+// getTimeHash returns Unix Epoch Time
+func getTimeHash(scheduledTime time.Time) int64 {
+	return scheduledTime.Unix()
 }

@@ -23,16 +23,18 @@ func MakeSotreCore(client client.Client) *StoreCore {
 
 func (s *StoreCore) VolumeBuilder(bt batchv1beta1.BatchTemplate, appname string) (*corev1.Volume, error) {
 	ss := &batchv1beta1.StorageSource{}
-	err := s.client.Get(context.TODO(), types.NamespacedName{Namespace: bt.Namespace, Name: bt.Spec.StorageName}, ss)
+	err := s.client.Get(context.TODO(), types.NamespacedName{Namespace: bt.Namespace, Name: bt.Spec.StroageInfo.StorageName}, ss)
 	if err != nil {
 		return nil, err
 	}
 	pv, err := s.createPV(ss, appname)
 	if err != nil {
+		// fmt.Println("Heer>?")
 		return nil, err
 	}
 	pvc, err := s.createPVC(pv, appname)
 	if err != nil {
+		// fmt.Println("Hee!>?")
 		return nil, err
 	}
 	volume := &corev1.Volume{
@@ -53,8 +55,9 @@ func (s *StoreCore) createPV(ss *batchv1beta1.StorageSource, appname string) (*c
 			Namespace: ss.Namespace,
 		},
 		Spec: corev1.PersistentVolumeSpec{
-			Capacity:               corev1.ResourceList{},
+			Capacity:               ss.Spec.Capacity,
 			PersistentVolumeSource: ss.Spec.Source,
+			AccessModes:            []corev1.PersistentVolumeAccessMode{corev1.ReadWriteOnce},
 		},
 	}
 	err := s.client.Create(context.TODO(), pv)
@@ -71,6 +74,7 @@ func (s *StoreCore) createPVC(pv *corev1.PersistentVolume, appname string) (*cor
 			Namespace: pv.Namespace,
 		},
 		Spec: corev1.PersistentVolumeClaimSpec{
+			Resources:   corev1.ResourceRequirements{Requests: pv.Spec.Capacity},
 			AccessModes: []corev1.PersistentVolumeAccessMode{corev1.ReadWriteOnce},
 			VolumeName:  pv.Name,
 		},

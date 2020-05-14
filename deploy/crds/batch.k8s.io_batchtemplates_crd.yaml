@@ -31,8 +31,16 @@ spec:
         spec:
           description: BatchTemplateSpec defines the desired state of BatchTemplate
           properties:
-            storageName:
-              type: string
+            storageInfo:
+              properties:
+                mountPath:
+                  type: string
+                storageName:
+                  type: string
+              required:
+              - mountPath
+              - storageName
+              type: object
             template:
               type: object
             type:
@@ -42,7 +50,7 @@ spec:
                 https://book-v1.book.kubebuilder.io/beyond_basics/generating_crd.html'
               type: string
           required:
-          - storageName
+          - storageInfo
           - template
           - type
           type: object

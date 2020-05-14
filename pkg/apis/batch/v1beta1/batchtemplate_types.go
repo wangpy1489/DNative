@@ -15,7 +15,12 @@ type BatchTemplateSpec struct {
 	// Add custom validation using kubebuilder tags: https://book-v1.book.kubebuilder.io/beyond_basics/generating_crd.html
 	Type        BatchJobType `json:"type"`
 	Template    JobTemplate  `json:"template"`
-	StorageName string       `json:"storageName"`
+	StroageInfo StroageInfo  `json:"storageInfo"`
+}
+
+type StroageInfo struct {
+	StorageName string `json:"storageName"`
+	MountPath   string `json:"mountPath"`
 }
 
 // BatchTemplateStatus defines the observed state of BatchTemplate

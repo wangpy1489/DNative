@@ -7,10 +7,12 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"time"
 
 	"github.com/gorilla/mux"
 	batchv1beta1 "github.com/wangpy1489/DNative/pkg/apis/batch/v1beta1"
 	"github.com/wangpy1489/DNative/pkg/storage"
+	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
@@ -31,30 +33,39 @@ func (rou *Router) findHttptrigger(r *http.Request) (*batchv1beta1.HttpTrigger, 
 
 func (rou *Router) submitBatchJob(template *batchv1beta1.BatchTemplate) (*batchv1beta1.BatchJob, error) {
 	temp := template.Spec.DeepCopy()
-	if len(template.Spec.StorageName) != 0 {
+	jobName := fmt.Sprintf("%s-%d", template.Name, getTimeHash(time.Now()))
+	if len(template.Spec.StroageInfo.StorageName) != 0 {
 		sc := storage.MakeSotreCore(rou.kubeclient)
-		volume, err := sc.VolumeBuilder(*template, "test")
+		volume, err := sc.VolumeBuilder(*template, jobName)
 		if err != nil {
 			return nil, err
+		}
+		vm := corev1.VolumeMount{
+			Name:      volume.Name,
+			MountPath: temp.StroageInfo.MountPath,
 		}
 		switch temp.Type {
 		case batchv1beta1.Batch:
 			temp.Template.Batch.Spec.Volumes = append(temp.Template.Batch.Spec.Volumes, *volume)
+			for i, k := range temp.Template.Batch.Spec.Containers {
+				temp.Template.Batch.Spec.Containers[i].VolumeMounts = append(k.VolumeMounts, vm)
+			}
 		case batchv1beta1.Spark:
 			temp.Template.Spark.Volumes = append(temp.Template.Spark.Volumes, *volume)
+			temp.Template.Spark.Driver.VolumeMounts = append(temp.Template.Spark.Driver.VolumeMounts, vm)
+			temp.Template.Spark.Executor.VolumeMounts = append(temp.Template.Spark.Driver.VolumeMounts, vm)
 		}
 	}
 	newApp := &batchv1beta1.BatchJob{
 		ObjectMeta: metav1.ObjectMeta{
-			Name:      template.Name,
+			Name:      jobName,
 			Namespace: template.Namespace,
 		},
 		Spec: batchv1beta1.BatchJobSpec{
-			Type:     template.Spec.Type,
+			Type:     temp.Type,
 			Template: temp.Template,
 		},
 	}
-	newApp.Spec.Template = template.Spec.Template
 	err := rou.kubeclient.Create(context.TODO(), newApp)
 	if err != nil {
 		return nil, err
